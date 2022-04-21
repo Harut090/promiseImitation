@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const PromisImitation = {
+        resolve: function (value) {
+          this.successCallback(value);
+        },
+        reject: function (reason) {
+          this.errorCallback(reason);
+        },
+        then: function (fn) {
+          this.successCallback = fn;
+          return this;
+        },
+        catch: function (fn) {
+          this.errorCallback = fn;
+          return this;
+        },
+      };
+
+      function ajax(url, config) {
+        config = config ?? {};
+        config.type = config.type ?? "GET";
+        config.headers = config.headers ?? {};
+        config.data = config.data ?? null;
+
+        let xhr = new XMLHttpRequest();
+        xhr.open(config.type, url);
+        xhr.onload = function () {
+          PromisImitation.resolve(this.responseText);
+        };
+
+        xhr.onerror = function (e) {
+          PromisImitation.reject("Request failed");
+        };
+        xhr.send(config.data);
+
+        return PromisImitation;
+      }
+
+      ajax("https://api.thecatapi.com/v1/categories", {
+        type: "GET",
+        headers: {},
+        data: {},
+      })
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      ajax("https://nonexistingurl", {
+        type: "GET",
+        headers: {},
+        data: {},
+      })
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    </script>
+  </body>
+</html>
